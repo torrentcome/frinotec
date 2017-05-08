@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 
 /**
  * Created by come on 08/05/2017.
+ * Chronometer view
  */
 
 public class Chronometer extends TextView {
@@ -168,10 +169,6 @@ public class Chronometer extends TextView {
         if (mOnChronometerTickListener != null) {
             mOnChronometerTickListener.onChronometerTick(this);
         }
-    }
-
-    public long getTimeElapsed() {
-        return timeElapsed;
     }
 
 }

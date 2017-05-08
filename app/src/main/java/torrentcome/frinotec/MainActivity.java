@@ -22,11 +22,11 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import torrentcome.frinotec.helper.CameraHelper;
-import torrentcome.frinotec.helper.CameraPreview;
+import torrentcome.frinotec.view.CameraPreview;
 import torrentcome.frinotec.view.Chronometer;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final String LINEAR_TAG = "icon bitmap";
+    private static final String LINEAR_TAG = "drag tag";
 
     /* chrono */
     private Chronometer chrono;
@@ -123,9 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private android.widget.RelativeLayout.LayoutParams layoutParams;
-
-    protected class myDragEventListener  implements View.OnDragListener {
+    protected class myDragEventListener implements View.OnDragListener {
 
         // This is the method that the system calls when it dispatches a drag event to the
         // listener.
@@ -135,11 +133,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             final int action = event.getAction();
 
             // Handles each of the expected events
-            switch(action) {
+            switch (action) {
 
                 case DragEvent.ACTION_DRAG_STARTED:
 
-                    layoutParams = (RelativeLayout.LayoutParams)v.getLayoutParams();
                     // Determines if this View can accept the dragged data
                     if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
 
@@ -157,8 +154,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 case DragEvent.ACTION_DRAG_ENTERED:
 
-                    int x_cord = (int) event.getX();
-                    int y_cord = (int) event.getY();
+                    int x_cord;
+                    int y_cord;
 
                     // Invalidate the view to force a redraw in the new tint
                     v.invalidate();
@@ -166,9 +163,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return true;
 
                 case DragEvent.ACTION_DRAG_LOCATION:
-
-                    x_cord = (int) event.getX();
-                    y_cord = (int) event.getY();
 
                     // Ignore the event
                     return true;
@@ -179,8 +173,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     y_cord = (int) event.getY();
 
                     ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(v.getLayoutParams());
-                    int left = (int) x_cord - (v.getWidth() / 2);
-                    int top = (int) y_cord - (v.getHeight() / 2);
+                    int left = x_cord - (v.getWidth() / 2);
+                    int top = y_cord - (v.getHeight() / 2);
                     marginParams.setMargins(left, top, 0, 0);
                     RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
                     v.setLayoutParams(layoutParams);
@@ -214,11 +208,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     // Does a getResult(), and displays what happened.
                     if (event.getResult()) {
-                        Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();;
-
+                        Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(MainActivity.this, "The drop didn't work.", Toast.LENGTH_LONG).show();;
-
+                        Toast.makeText(MainActivity.this, "The drop didn't work.", Toast.LENGTH_LONG).show();
                     }
 
                     // returns true; the value is ignored.
@@ -226,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 // An unknown action type was received.
                 default:
-                    Log.e("DragDrop Example","Unknown action type received by OnDragListener.");
+                    Log.e("DragDrop Example", "Unknown action type received by OnDragListener.");
                     break;
             }
 
@@ -241,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private static Drawable shadow;
 
         // Defines the constructor for myDragShadowBuilder
-        public MyDragShadowBuilder(View v) {
+        MyDragShadowBuilder(View v) {
 
             // Stores the View parameter passed to myDragShadowBuilder.
             super(v);
@@ -253,9 +245,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Defines a callback that sends the drag shadow dimensions and touch point back to the
         // system.
         @Override
-        public void onProvideShadowMetrics (Point size, Point touch) {
+        public void onProvideShadowMetrics(Point size, Point touch) {
             // Defines local variables
-             int width, height;
+            int width, height;
 
             // Sets the width of the shadow to half the width of the original View
             width = getView().getWidth() / 2;
