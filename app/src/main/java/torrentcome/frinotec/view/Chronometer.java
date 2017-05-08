@@ -1,6 +1,5 @@
 package torrentcome.frinotec.view;
 
-
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
@@ -10,13 +9,19 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 
-public class Chronometre extends TextView {
+/**
+ * Created by come on 08/05/2017.
+ */
+
+public class Chronometer extends TextView {
+    private long timeWhenStopped = 0;
+
     @SuppressWarnings("unused")
     private static final String TAG = "Chronometer";
 
     public interface OnChronometerTickListener {
 
-        void onChronometerTick(Chronometre chronometer);
+        void onChronometerTick(Chronometer chronometer);
     }
 
     private long mBase;
@@ -29,16 +34,17 @@ public class Chronometre extends TextView {
 
     private long timeElapsed;
 
-    public Chronometre(Context context) {
-        this (context, null, 0);
+    public Chronometer(Context context) {
+        this(context, null, 0);
     }
 
-    public Chronometre(Context context, AttributeSet attrs) {
-        this (context, attrs, 0);
+    public Chronometer(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
     }
 
-    public Chronometre(Context context, AttributeSet attrs, int defStyle) {
-        super (context, attrs, defStyle);
+    public Chronometer(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+
         init();
     }
 
@@ -67,15 +73,22 @@ public class Chronometre extends TextView {
     }
 
     public void start() {
+        setBase(SystemClock.elapsedRealtime() - timeWhenStopped);
         mStarted = true;
         updateRunning();
     }
 
     public void stop() {
         mStarted = false;
+        timeWhenStopped = SystemClock.elapsedRealtime() - getBase();
         updateRunning();
     }
 
+    public void reset() {
+        stop();
+        setBase(SystemClock.elapsedRealtime());
+        timeWhenStopped = 0;
+    }
 
     public void setStarted(boolean started) {
         mStarted = started;
@@ -84,14 +97,14 @@ public class Chronometre extends TextView {
 
     @Override
     protected void onDetachedFromWindow() {
-        super .onDetachedFromWindow();
+        super.onDetachedFromWindow();
         mVisible = false;
         updateRunning();
     }
 
     @Override
     protected void onWindowVisibilityChanged(int visibility) {
-        super .onWindowVisibilityChanged(visibility);
+        super.onWindowVisibilityChanged(visibility);
         mVisible = visibility == VISIBLE;
         updateRunning();
     }
@@ -101,16 +114,16 @@ public class Chronometre extends TextView {
 
         DecimalFormat df = new DecimalFormat("00");
 
-        int hours = (int)(timeElapsed / (3600 * 1000));
-        int remaining = (int)(timeElapsed % (3600 * 1000));
+        int hours = (int) (timeElapsed / (3600 * 1000));
+        int remaining = (int) (timeElapsed % (3600 * 1000));
 
-        int minutes = (int)(remaining / (60 * 1000));
-        remaining = (int)(remaining % (60 * 1000));
+        int minutes = (int) (remaining / (60 * 1000));
+        remaining = (int) (remaining % (60 * 1000));
 
-        int seconds = (int)(remaining / 1000);
-        remaining = (int)(remaining % (1000));
+        int seconds = (int) (remaining / 1000);
+        remaining = (int) (remaining % (1000));
 
-        int milliseconds = (int)(((int)timeElapsed % 1000) / 100);
+        int milliseconds = (int) (((int) timeElapsed % 1000) / 100);
 
         String text = "";
 
@@ -145,7 +158,7 @@ public class Chronometre extends TextView {
             if (mRunning) {
                 updateText(SystemClock.elapsedRealtime());
                 dispatchChronometerTick();
-                sendMessageDelayed(Message.obtain(this , TICK_WHAT),
+                sendMessageDelayed(Message.obtain(this, TICK_WHAT),
                         100);
             }
         }

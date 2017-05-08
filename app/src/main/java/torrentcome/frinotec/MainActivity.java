@@ -3,7 +3,6 @@ package torrentcome.frinotec;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -11,13 +10,12 @@ import android.widget.ImageButton;
 
 import torrentcome.frinotec.helper.CameraHelper;
 import torrentcome.frinotec.helper.CameraPreview;
-import torrentcome.frinotec.view.Chronometre;
+import torrentcome.frinotec.view.Chronometer;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     /* chrono */
-    private Chronometre chrono;
-    private long lastPause;
+    private Chronometer chrono;
 
     public static final int START = 0;
     public static final int STOP = 1;
@@ -29,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         /* chrono */
-        chrono = (Chronometre) findViewById(R.id.chronometer1);
+        chrono = (Chronometer) findViewById(R.id.chronometer1);
 
         /* clear chrono */
         ImageButton button1 = (ImageButton) findViewById(R.id.button1);
@@ -51,9 +49,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // Create our Preview view and set it as the content of our activity.
                 CameraPreview mPreview = new CameraPreview(this, mCamera);
                 FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-                if (preview != null) {
+                FrameLayout click_zone = (FrameLayout) findViewById(R.id.click_zone);
+                if (preview != null && click_zone != null) {
                     preview.addView(mPreview);
                     preview.setOnClickListener(this);
+                    click_zone.setOnClickListener(this);
                 }
             }
         }
@@ -63,23 +63,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
-            case R.id.camera_preview:
+            case R.id.click_zone:
                 switch (click) {
                     case START:
-                        chrono.setBase(chrono.getBase() + SystemClock.elapsedRealtime() - lastPause);
                         chrono.start();
                         click = STOP;
                         break;
                     case STOP:
-                        lastPause = SystemClock.elapsedRealtime();
                         chrono.stop();
                         click = START;
                         break;
                 }
                 break;
             case R.id.button1:
-                chrono.stop();
-                chrono.setBase(SystemClock.elapsedRealtime());
+                chrono.reset();
                 click = START;
                 break;
             default:
