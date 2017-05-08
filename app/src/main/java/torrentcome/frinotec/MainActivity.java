@@ -1,15 +1,11 @@
 package torrentcome.frinotec;
 
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
@@ -21,11 +17,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /* chrono */
     private Chronometre chrono;
-    private ImageButton start, stop, restart;
+    private long lastPause;
 
-    /* camera */
-    private Camera mCamera;
-    private CameraPreview mPreview;
+    public static final int START = 0;
+    public static final int STOP = 1;
+    private int click;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,70 +29,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         /* chrono */
-        start = (ImageButton) findViewById(R.id.button1);
-        stop = (ImageButton) findViewById(R.id.button2);
-        restart = (ImageButton) findViewById(R.id.button3);
         chrono = (Chronometre) findViewById(R.id.chronometer1);
 
-        start.setOnClickListener(this);
-        stop.setOnClickListener(this);
-        restart.setOnClickListener(this);
+        /* clear chrono */
+        ImageButton button1 = (ImageButton) findViewById(R.id.button1);
+        if (button1 != null) {
+            button1.setOnClickListener(this);
+        }
 
         /* camera */
         if (CameraHelper.checkCameraHardware(this)) {
             // Create an instance of Camera
-            mCamera = CameraHelper.getCameraInstance();
-            // make any resize, rotate or reformatting changes here
-            if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
-                mCamera.setDisplayOrientation(90);
-            } else {
-                mCamera.setDisplayOrientation(0);
-            }
-            // Create our Preview view and set it as the content of our activity.
-            mPreview = new CameraPreview(this, mCamera);
-            FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-            if (preview != null) {
-                preview.addView(mPreview);
+            Camera mCamera = CameraHelper.getCameraInstance();
+            if (mCamera != null) {
+                // make any resize, rotate or reformatting changes here
+                if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                    mCamera.setDisplayOrientation(90);
+                } else {
+                    mCamera.setDisplayOrientation(0);
+                }
+                // Create our Preview view and set it as the content of our activity.
+                CameraPreview mPreview = new CameraPreview(this, mCamera);
+                FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+                if (preview != null) {
+                    preview.addView(mPreview);
+                    preview.setOnClickListener(this);
+                }
             }
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
-
-    /**
-     * Check if this device has a camera
-     */
-    private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            // this device has a camera
-            return true;
-        } else {
-            // no camera on this device
-            return false;
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (chrono != null) chrono.start();
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
+            case R.id.camera_preview:
+                switch (click) {
+                    case START:
+                        chrono.setBase(chrono.getBase() + SystemClock.elapsedRealtime() - lastPause);
+                        chrono.start();
+                        click = STOP;
+                        break;
+                    case STOP:
+                        lastPause = SystemClock.elapsedRealtime();
+                        chrono.stop();
+                        click = START;
+                        break;
+                }
+                break;
             case R.id.button1:
-                chrono.start();
-                break;
-            case R.id.button2:
                 chrono.stop();
-                break;
-            case R.id.button3:
                 chrono.setBase(SystemClock.elapsedRealtime());
+                click = START;
+                break;
+            default:
                 break;
         }
     }
