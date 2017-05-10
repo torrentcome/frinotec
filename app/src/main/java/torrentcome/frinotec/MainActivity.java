@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import torrentcome.frinotec.helper.CameraHelper;
+import torrentcome.frinotec.view.BaseBarView;
 import torrentcome.frinotec.view.CameraPreview;
 import torrentcome.frinotec.view.Chronometer;
 
@@ -42,10 +43,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /* chrono */
         chrono = (Chronometer) findViewById(R.id.chronometer1);
+
         /* clear chrono */
-        ImageButton button1 = (ImageButton) findViewById(R.id.button1);
-        if (button1 != null) {
-            button1.setOnClickListener(this);
+        ImageButton clearChrono = (ImageButton) findViewById(R.id.clearchrono);
+        if (clearChrono != null) {
+            clearChrono.setOnClickListener(this);
+        }
+
+        BaseBarView barView = (BaseBarView) findViewById(R.id.bar_view);
+        if (barView != null) {
+            barView.animateStats(50000);
         }
 
         /* camera */
@@ -114,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                 }
                 break;
-            case R.id.button1:
+            case R.id.clearchrono:
                 chrono.reset();
                 click = START;
                 break;
