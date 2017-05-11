@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
@@ -19,28 +18,25 @@ public class BaseBarView extends View {
     private Paint mLinePaint;
     private RectF mRectBounds = new RectF();
     private int mColorLeft;
-    private int mColorRight;
     private int mColorDefault;
-    private int left, right;
-    private int top, bottom;
-
-    private ObjectAnimator mAnimatorY;
+    private int top;
     private float mPhase = 1f;
-    private Path mPath;
+    private int millisec;
+    private ObjectAnimator mAnimatorY;
 
     public BaseBarView(Context context) {
         super(context);
-        init(context, null);
+        init(context);
     }
 
     public BaseBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
+        init(context);
     }
 
     public BaseBarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs);
+        init(context);
     }
 
     @Override
@@ -69,34 +65,29 @@ public class BaseBarView extends View {
                 0,
                 w,
                 h);
-
         setMeasuredDimension(w, h);
     }
 
-    /**
-     * Set the animation phase.
-     *
-     * @param phase Phase.
-     */
+
     public void setPhase(float phase) {
         mPhase = phase;
     }
 
-    /**
-     * call animateStats with a default parameter
-     */
-    public void animateStats() {
-        animateStats(1000);
+    public void setAnimStats(int millisec) {
+        this.millisec = millisec;
     }
 
-    /**
-     * Animate the phase from 0f to 1f according to the duration.
-     *
-     * @param millisec Duration in milliseconds.
-     */
-    public void animateStats(int millisec) {
+    public void animateStop() {
+        if (mAnimatorY != null) {
+            mAnimatorY.pause();
+        }
+    }
+
+    public void animateStats() {
         mAnimatorY = ObjectAnimator.ofFloat(this, "phase", 0f, 1f);
         mAnimatorY.setDuration(millisec);
+        mAnimatorY.setRepeatCount(ObjectAnimator.INFINITE);
+        mAnimatorY.setRepeatMode(ObjectAnimator.RESTART);
         mAnimatorY.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -106,12 +97,11 @@ public class BaseBarView extends View {
         mAnimatorY.start();
     }
 
-    private void init(Context context, AttributeSet attrs) {
+
+    private void init(Context context) {
         final Resources resources = context.getResources();
         mColorLeft = resources.getColor(R.color.colorAccent);
-        mColorRight = resources.getColor(R.color.colorAccent);
         mColorDefault = resources.getColor(R.color.colorPrimaryLight);
-        mPath = new Path();
         mRectPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mRectPaint.setStyle(Paint.Style.FILL);
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -120,28 +110,8 @@ public class BaseBarView extends View {
         top = 100;
     }
 
-    private void drawRectangleLeft(Canvas canvas) {
-        int total = this.right + this.left;
-        int height = getHeight();
-        mLinePaint.setColor(mColorLeft);
-        if (total > 0) {
-            mRectBounds.set(0,
-                    0,
-                    mPhase * (getWidth() * this.left / total),
-                    getHeight());
-            canvas.drawRect(mRectBounds, mLinePaint);
-        } else if (total == 0) {
-            mRectBounds.set(0,
-                    0,
-                    mPhase * (getWidth() * 1 / 2),
-                    getHeight());
-            canvas.drawRect(mRectBounds, mLinePaint);
-            drawTriangleLeft(canvas, (int) (mPhase * (getWidth() * 1 / 2)), height);
-        }
-    }
-
     private void drawRectangleTop(Canvas canvas) {
-        int total = this.top + this.bottom;
+        int total = this.top;
         mLinePaint.setColor(mColorLeft);
         if (total > 0) {
             mRectBounds.set(0,
@@ -150,56 +120,5 @@ public class BaseBarView extends View {
                     mPhase * (getHeight() * this.top / total));
             canvas.drawRect(mRectBounds, mLinePaint);
         }
-    }
-
-    private void drawRectangleRight(Canvas canvas) {
-        int total = this.right + this.left;
-        int height = getHeight();
-        mLinePaint.setColor(mColorRight);
-        if (total > 0) {
-            mRectBounds.set(getWidth() - mPhase * (getWidth() * right / total) + 20,
-                    0,
-                    getWidth(),
-                    getHeight());
-
-            canvas.drawRect(mRectBounds, mLinePaint);
-        } else if (total == 0) {
-            mRectBounds.set(getWidth() - mPhase * (getWidth() * 1 / 2) + 20,
-                    0,
-                    getWidth(),
-                    getHeight());
-            canvas.drawRect(mRectBounds, mLinePaint);
-            drawTriangleRight(canvas, (int) (getWidth() - mPhase * (getWidth() * 1 / 2)) + 20, height);
-        }
-
-    }
-
-    private void drawTriangleLeft(Canvas canvas, int x, int y) {
-        mLinePaint.setStrokeWidth(0);
-        mLinePaint.setColor(mColorLeft);
-        mLinePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPath.reset();
-        mPath.setFillType(Path.FillType.EVEN_ODD);
-        mPath.moveTo(x, 0);
-        mPath.lineTo(x, y);
-        mPath.lineTo(x + 20, 0);
-        mPath.lineTo(x, 0);
-        mPath.close();
-
-        canvas.drawPath(mPath, mLinePaint);
-    }
-
-    private void drawTriangleRight(Canvas canvas, int x, int y) {
-        mLinePaint.setStrokeWidth(0);
-        mLinePaint.setColor(mColorRight);
-        mLinePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPath.reset();
-        mPath.setFillType(Path.FillType.EVEN_ODD);
-        mPath.moveTo(x + 1, y);
-        mPath.lineTo(x - 20, y);
-        mPath.lineTo(x + 1, 0);
-        mPath.lineTo(x + 1, y);
-        mPath.close();
-        canvas.drawPath(mPath, mLinePaint);
     }
 }

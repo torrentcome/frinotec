@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">frinotec</string>
-    <string name="action_settings">Settings</string>
+    <string name="ui">Config</string>
+    <string name="show_tempo_bar">Show tempo</string>
+    <string name="bar_tempo_goutte_minutes">1 gouttes / secondes</string>
+    <string name="nombre_de_goutte">secondes = </string>
+
+    <string name="config">Config</string>
+    <string name="secondes">s</string>
+    <string name="finish">FINISH</string>
 </resources>

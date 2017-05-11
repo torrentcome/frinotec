@@ -18,11 +18,10 @@
 
     <torrentcome.frinotec.view.BaseBarView
         android:id="@+id/bar_view"
-        android:layout_width="10dp"
-        android:layout_height="match_parent"
+        android:layout_width="6dp"
+        android:layout_height="300dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_centerVertical="true"/>
 
     <LinearLayout
         android:id="@+id/drag"
@@ -33,14 +32,6 @@
         android:clickable="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
-
-        <ImageButton
-            android:id="@+id/set_tempo"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:padding="4dp"
-            android:background="@drawable/ripple"
-            android:src="@drawable/ic_assessment_black_24dp" />
 
         <torrentcome.frinotec.view.Chronometer
             android:id="@+id/chronometer1"
@@ -56,6 +47,14 @@
             android:padding="4dp"
             android:background="@drawable/ripple"
             android:src="@drawable/ic_backspace_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/show_tempo"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:padding="4dp"
+            android:background="@drawable/ripple"
+            android:src="@drawable/ic_assessment_black_24dp" />
 
     </LinearLayout>
 
